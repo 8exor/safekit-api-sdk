@@ -50,6 +50,8 @@ const { hash, receipt } = await safe.executeWithSigner(tx, account);
 
 `tx` is `{ to, value?, data?, operation?, nonce? }`. If `nonce` is set it must equal the Safe's current nonce.
 
+The package also exports `SAFE_ABI` (the minimal Safe ABI the SDK calls) and `SAFE_TX_TYPES` (the EIP-712 `SafeTx` types), for callers who want to build their own calls or verify signatures.
+
 ## Pre-flight checks
 
 Before anything is sent, the SDK checks:

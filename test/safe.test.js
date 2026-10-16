@@ -172,3 +172,57 @@ test("cancelWithSigner sends a zero-value self call at the current nonce", async
   assert.equal(value, 0n);
   assert.equal(data, "0x");
 });
+
+test("execte sends a signature that was produced earlier", async () => {
+  const { publicClient, walletClient, state } = makeClients();
+  const safe = createSafe({ publicClient, walletClient, safeAddress: SAFE });
+
+  const signature = await safe.signTransaction(TX, OWNER);
+  const result = await safe.execute(TX, signature);
+
+  assert.equal(result.hash, TX_HASH);
+  assert.equal(state.writes.length, 1);
+});
+
+test("execute rejects a signature made for an older Safe nonce", async () => {
+  const signedAtZero = makeClients({ nonce: 0n });
+  const signature = await createSafe({
+    publicClient: signedAtZero.publicClient,
+    walletClient: signedAtZero.walletClient,
+    safeAddress: SAFE,
+  }).signTransaction(TX, OWNER);
+
+  const later = makeClients({ nonce: 1n });
+  const safe = createSafe({ publicClient: later.publicClient, walletClient: later.walletClient, safeAddress: SAFE });
+
+  await assert.rejects(safe.execute(TX, signature), { code: "STALE_NONCE" });
+  assert.equal(later.state.writes.length, 0);
+});
+
+test("execution requires a walletClient with a local account", async () => {
+  const { publicClient } = makeClients();
+  const safe = createSafe({ publicClient, safeAddress: SAFE });
+
+  await assert.rejects(safe.executeWithSigner(TX, OWNER), TypeError);
+});
+
+test("rejects an invalid Safe address or recipient", async () => {
+  const { publicClient, walletClient } = makeClients();
+
+  assert.throws(() => createSafe({ publicClient, walletClient, safeAddress: "0x1234" }), TypeError);
+
+  const safe = createSafe({ publicClient, walletClient, safeAddress: SAFE });
+  await assert.rejects(safe.executeWithSigner({ to: "0xnot-an-address" }, OWNER), TypeError);
+});
+
+test("reads owners, threshold, nonce and membership", async () => {
+  const { publicClient, walletClient } = makeClients({ owners: [OWNER.address], threshold: 1, nonce: 7n });
+  const safe = createSafe({ publicClient, walletClient, safeAddress: SAFE });
+
+  assert.equal(safe.address, getAddress(SAFE));
+  assert.deepEqual(await safe.getOwners(), [OWNER.address]);
+  assert.equal(await safe.getThreshold(), 1);
+  assert.equal(await safe.getNonce(), 7n);
+  assert.equal(await safe.isOwner(OWNER.address.toLowerCase()), true);
+  assert.equal(await safe.isOwner(OTHER.address), false);
+});

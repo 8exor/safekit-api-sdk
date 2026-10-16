@@ -27,6 +27,7 @@ function withLock(key, fn) {
 }
 
 function normalizeTx(tx, nonce) {
+  if (!isAddress(tx.to)) throw new TypeError(`Invalid tx.to: ${tx.to}`);
   return {
     to: getAddress(tx.to),
     value: BigInt(tx.value ?? 0),

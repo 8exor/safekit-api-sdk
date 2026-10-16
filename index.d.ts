@@ -1,4 +1,10 @@
-import type { Account, Address, Hash, Hex, PublicClient, TransactionReceipt, WalletClient } from "viem";
+import type { Abi, Account, Address, Hash, Hex, PublicClient, TransactionReceipt, WalletClient } from "viem";
+
+/** Minimal Safe ABI used by the SDK. */
+export const SAFE_ABI: Abi;
+
+/** EIP-712 types for the SafeTx struct. */
+export const SAFE_TX_TYPES: Record<string, readonly { name: string; type: string }[]>;
 
 export interface SafeTxInput {
   to: Address;
