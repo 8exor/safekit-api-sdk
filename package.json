@@ -1,0 +1,45 @@
+{
+  "name": "safekit-api-sdk",
+  "version": "0.1.0",
+  "description": "Execute Safe transactions directly on-chain with a single signer, without the Safe Transaction Service API",
+  "type": "module",
+  "author": "Dimpal Kumar (https://github.com/8exor)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/8exor/safekit-api-sdk.git"
+  },
+  "homepage": "https://github.com/8exor/safekit-api-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/8exor/safekit-api-sdk/issues"
+  },
+  "main": "src/index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/safe.test.js"
+  },
+  "keywords": [
+    "safe",
+    "gnosis-safe",
+    "multisig",
+    "ethereum",
+    "viem"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "viem": "^2.57.7"
+  }
+}

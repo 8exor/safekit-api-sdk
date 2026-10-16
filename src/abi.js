@@ -1,0 +1,90 @@
+export const SAFE_ABI = [
+  {
+    type: "function",
+    name: "getOwners",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address[]" }],
+  },
+  {
+    type: "function",
+    name: "getThreshold",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "nonce",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getTransactionHash",
+    stateMutability: "view",
+    inputs: [
+      { name: "to", type: "address" },
+      { name: "value", type: "uint256" },
+      { name: "data", type: "bytes" },
+      { name: "operation", type: "uint8" },
+      { name: "safeTxGas", type: "uint256" },
+      { name: "baseGas", type: "uint256" },
+      { name: "gasPrice", type: "uint256" },
+      { name: "gasToken", type: "address" },
+      { name: "refundReceiver", type: "address" },
+      { name: "_nonce", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "execTransaction",
+    stateMutability: "payable",
+    inputs: [
+      { name: "to", type: "address" },
+      { name: "value", type: "uint256" },
+      { name: "data", type: "bytes" },
+      { name: "operation", type: "uint8" },
+      { name: "safeTxGas", type: "uint256" },
+      { name: "baseGas", type: "uint256" },
+      { name: "gasPrice", type: "uint256" },
+      { name: "gasToken", type: "address" },
+      { name: "refundReceiver", type: "address" },
+      { name: "signatures", type: "bytes" },
+    ],
+    outputs: [{ name: "success", type: "bool" }],
+  },
+  {
+    type: "event",
+    name: "ExecutionSuccess",
+    inputs: [
+      { name: "txHash", type: "bytes32", indexed: false },
+      { name: "payment", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "ExecutionFailure",
+    inputs: [
+      { name: "txHash", type: "bytes32", indexed: false },
+      { name: "payment", type: "uint256", indexed: false },
+    ],
+  },
+];
+
+export const SAFE_TX_TYPES = {
+  SafeTx: [
+    { name: "to", type: "address" },
+    { name: "value", type: "uint256" },
+    { name: "data", type: "bytes" },
+    { name: "operation", type: "uint8" },
+    { name: "safeTxGas", type: "uint256" },
+    { name: "baseGas", type: "uint256" },
+    { name: "gasPrice", type: "uint256" },
+    { name: "gasToken", type: "address" },
+    { name: "refundReceiver", type: "address" },
+    { name: "nonce", type: "uint256" },
+  ],
+};
