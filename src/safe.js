@@ -7,6 +7,7 @@ import {
   zeroAddress,
 } from "viem";
 import { SAFE_ABI, SAFE_TX_TYPES } from "./abi.js";
+import { encodeCall } from "./helpers.js";
 
 export class SafeKitError extends Error {
   constructor(code, message, details) {
@@ -198,6 +199,15 @@ export function createSafe({ publicClient, walletClient, safeAddress }) {
     return { hash, receipt };
   };
 
+  const executeWithSigner = async (tx, account) => {
+    requireWallet();
+    return withLock(lockKey, async () => {
+      const resolved = await resolveTx(tx);
+      const signature = await signTyped(resolved, account);
+      return send(resolved, signature);
+    });
+  };
+
   return {
     address,
     getOwners,
@@ -235,13 +245,14 @@ export function createSafe({ publicClient, walletClient, safeAddress }) {
       });
     },
 
-    async executeWithSigner(tx, account) {
-      requireWallet();
-      return withLock(lockKey, async () => {
-        const resolved = await resolveTx(tx);
-        const signature = await signTyped(resolved, account);
-        return send(resolved, signature);
-      });
+    executeWithSigner,
+
+    async writeContract(call, account) {
+      return executeWithSigner(encodeCall(call), account);
+    },
+
+    async getBalance() {
+      return publicClient.getBalance({ address });
     },
 
     async cancelWithSigner(account) {

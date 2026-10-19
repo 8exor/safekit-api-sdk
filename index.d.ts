@@ -59,6 +59,35 @@ export interface Safe {
   execute(tx: SafeTxInput, signature: SafeSignature): Promise<ExecuteResult>;
   executeWithSigner(tx: SafeTxInput, account: Account): Promise<ExecuteResult>;
   cancelWithSigner(account: Account): Promise<ExecuteResult>;
+  /** Encodes a call on any contract and executes it through the Safe. */
+  writeContract(call: ContractCall, account: Account): Promise<ExecuteResult>;
+  /** Native token balance held by the Safe, in wei. */
+  getBalance(): Promise<bigint>;
 }
 
 export function createSafe(options: SafeOptions): Safe;
+
+export interface ContractCall {
+  /** Target contract address. */
+  address: Address;
+  abi: Abi;
+  functionName: string;
+  args?: readonly unknown[];
+  /** Native value sent with the call, in wei. */
+  value?: bigint;
+}
+
+export interface EncodedCall {
+  to: Address;
+  value: bigint;
+  data: Hex;
+}
+
+export const ERC20_ABI: Abi;
+
+/** Encodes a contract call into a transaction the Safe can execute. */
+export function encodeCall(call: ContractCall): EncodedCall;
+/** Transfers an ERC-20 token from the Safe. Amount is in the token's smallest unit. */
+export function erc20Transfer(token: Address, to: Address, amount: bigint): EncodedCall;
+/** Approves a spender to use an ERC-20 token held by the Safe. */
+export function erc20Approve(token: Address, spender: Address, amount: bigint): EncodedCall;

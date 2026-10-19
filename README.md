@@ -52,6 +52,26 @@ const { hash, receipt } = await safe.executeWithSigner(tx, account);
 
 The package also exports `SAFE_ABI` (the minimal Safe ABI the SDK calls) and `SAFE_TX_TYPES` (the EIP-712 `SafeTx` types), for callers who want to build their own calls or verify signatures.
 
+## Contract calls
+
+Call any contract through the Safe without encoding calldata yourself:
+
+```js
+// Any contract function, mirroring viem's readContract/writeContract shape
+const { hash } = await safe.writeContract(
+  { address: "0xContract", abi, functionName: "setValue", args: [42n] },
+  account,
+);
+
+// ERC-20 helpers return a tx you can pass to execute, executeWithSigner, or estimateGas
+const transfer = erc20Transfer("0xToken", "0xReceiver", 1_000_000n);
+await safe.executeWithSigner(transfer, account);
+
+await safe.getBalance(); // native balance in wei
+```
+
+`encodeCall({ address, abi, functionName, args?, value? })` returns `{ to, value, data }` without sending, if you want to inspect or batch the call yourself.
+
 ## Pre-flight checks
 
 Before anything is sent, the SDK checks:

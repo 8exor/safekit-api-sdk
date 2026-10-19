@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { privateKeyToAccount } from "viem/accounts";
-import { encodeAbiParameters, encodeEventTopics, getAddress, hashTypedData } from "viem";
-import { createSafe } from "../src/index.js";
+import { encodeAbiParameters, encodeEventTopics, encodeFunctionData, getAddress, hashTypedData } from "viem";
+import { createSafe, erc20Approve, erc20Transfer } from "../src/index.js";
 import { SAFE_ABI, SAFE_TX_TYPES } from "../src/abi.js";
 
 const OWNER = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
@@ -72,6 +72,9 @@ function makeClients({
     },
     async waitForTransactionReceipt() {
       return { status: "success", logs: failureLogs };
+    },
+    async getBalance() {
+      return 5n * 10n ** 18n;
     },
   };
 
@@ -225,4 +228,50 @@ test("reads owners, threshold, nonce and membership", async () => {
   assert.equal(await safe.getNonce(), 7n);
   assert.equal(await safe.isOwner(OWNER.address.toLowerCase()), true);
   assert.equal(await safe.isOwner(OTHER.address), false);
+});
+
+test("writeContract encodes the call and sends it through the Safe", async () => {
+  const { publicClient, walletClient, state } = makeClients();
+  const safe = createSafe({ publicClient, walletClient, safeAddress: SAFE });
+
+  const call = {
+    address: OTHER.address,
+    abi: [
+      {
+        type: "function",
+        name: "setValue",
+        stateMutability: "nonpayable",
+        inputs: [{ name: "value", type: "uint256" }],
+        outputs: [],
+      },
+    ],
+    functionName: "setValue",
+    args: [42n],
+  };
+  const result = await safe.writeContract(call, OWNER);
+
+  assert.equal(result.hash, TX_HASH);
+  const [to, value, data] = state.writes[0].args;
+  assert.equal(to, getAddress(OTHER.address));
+  assert.equal(value, 0n);
+  assert.equal(data, encodeFunctionData({ abi: call.abi, functionName: "setValue", args: [42n] }));
+});
+
+test("erc20Transfer and erc20Approve encode the standard selectors", async () => {
+  const token = "0x2222222222222222222222222222222222222222";
+
+  const transfer = erc20Transfer(token, OTHER.address, 100n);
+  assert.equal(transfer.to, getAddress(token));
+  assert.equal(transfer.value, 0n);
+  assert.ok(transfer.data.startsWith("0xa9059cbb"));
+
+  const approve = erc20Approve(token, OTHER.address, 100n);
+  assert.ok(approve.data.startsWith("0x095ea7b3"));
+});
+
+test("getBalance returns the Safe's native balance", async () => {
+  const { publicClient, walletClient } = makeClients();
+  const safe = createSafe({ publicClient, walletClient, safeAddress: SAFE });
+
+  assert.equal(await safe.getBalance(), 5n * 10n ** 18n);
 });

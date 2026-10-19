@@ -1,6 +1,6 @@
 {
   "name": "safekit-api-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Execute Safe transactions directly on-chain with a single signer, without the Safe Transaction Service API",
   "type": "module",
   "author": "Dimpal Kumar (https://github.com/8exor)",
@@ -27,7 +27,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node --test test/safe.test.js"
+    "test": "node --test test/safe.test.js",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "safe",
