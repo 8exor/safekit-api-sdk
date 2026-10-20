@@ -8,15 +8,9 @@ import {
 } from "viem";
 import { SAFE_ABI, SAFE_TX_TYPES } from "./abi.js";
 import { encodeCall } from "./helpers.js";
+import { SafeKitError } from "./errors.js";
 
-export class SafeKitError extends Error {
-  constructor(code, message, details) {
-    super(message);
-    this.name = "SafeKitError";
-    this.code = code;
-    this.details = details;
-  }
-}
+export { SafeKitError };
 
 const locks = new Map();
 
