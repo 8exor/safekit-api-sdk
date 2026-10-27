@@ -19,6 +19,9 @@
     ".": {
       "types": "./index.d.ts",
       "default": "./src/index.js"
+    },
+    "./ethers": {
+      "default": "./src/ethers.js"
     }
   },
   "files": [
