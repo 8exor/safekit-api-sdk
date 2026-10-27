@@ -1,5 +1,4 @@
 import { SafeKitError } from "./errors.js";
-import { encodeCall } from "./helpers.js";
 
 // Library-agnostic Safe logic: checks, locking, and the public methods.
 // Everything that touches a chain client or a crypto library goes through `adapter`.
@@ -198,7 +197,7 @@ export function createSafeCore(adapter, safeAddress) {
     executeWithSigner,
 
     async writeContract(call, account) {
-      return executeWithSigner(encodeCall(call), account);
+      return executeWithSigner(adapter.encodeCall(call), account);
     },
 
     async getBalance() {

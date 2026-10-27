@@ -17,6 +17,19 @@ function safeTxDomain(address, chainId) {
   return { chainId, verifyingContract: address };
 }
 
+/**
+ * Encodes a contract call into a transaction for the Safe to execute.
+ * @param {{ address: string, abi: unknown[], functionName: string, args?: unknown[], value?: bigint }} call
+ * @returns {{ to: string, value: bigint, data: string }}
+ */
+export function encodeEthersCall({ address, abi, functionName, args = [], value = 0n }) {
+  return {
+    to: getAddress(address),
+    value: BigInt(value),
+    data: new Interface(abi).encodeFunctionData(functionName, args),
+  };
+}
+
 export function createEthersAdapter({ provider, signer }) {
   const runner = signer ?? provider;
 
@@ -27,6 +40,7 @@ export function createEthersAdapter({ provider, signer }) {
 
     isAddress: (value) => isAddress(value),
     checksum: (value) => getAddress(value),
+    encodeCall: (call) => encodeEthersCall(call),
 
     chainId: async () => Number((await provider.getNetwork()).chainId),
     getBalance: (address) => provider.getBalance(address),

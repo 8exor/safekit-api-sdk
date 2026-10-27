@@ -1,4 +1,5 @@
 import {
+  encodeFunctionData,
   getAddress,
   hashTypedData,
   isAddress,
@@ -19,6 +20,19 @@ function safeTxTypedData(address, chainId, tx) {
   };
 }
 
+/**
+ * Encodes a contract call into a transaction for the Safe to execute.
+ * @param {{ address: string, abi: unknown[], functionName: string, args?: unknown[], value?: bigint }} call
+ * @returns {{ to: string, value: bigint, data: string }}
+ */
+export function encodeViemCall({ address, abi, functionName, args = [], value = 0n }) {
+  return {
+    to: getAddress(address),
+    value: BigInt(value),
+    data: encodeFunctionData({ abi, functionName, args }),
+  };
+}
+
 export function createViemAdapter({ publicClient, walletClient }) {
   const account = walletClient?.account;
 
@@ -27,6 +41,7 @@ export function createViemAdapter({ publicClient, walletClient }) {
 
     isAddress: (value) => isAddress(value),
     checksum: (value) => getAddress(value),
+    encodeCall: (call) => encodeViemCall(call),
 
     chainId: async () => Number(await publicClient.getChainId()),
     getBalance: (address) => publicClient.getBalance({ address }),

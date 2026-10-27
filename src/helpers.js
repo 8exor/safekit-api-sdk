@@ -1,4 +1,4 @@
-import { encodeFunctionData, getAddress } from "viem";
+// Library-agnostic ERC-20 call builders. Each entry point encodes these with its own library.
 
 export const ERC20_ABI = [
   {
@@ -23,25 +23,12 @@ export const ERC20_ABI = [
   },
 ];
 
-/**
- * Encodes a contract call into a transaction for the Safe to execute.
- * @param {{ address: string, abi: unknown[], functionName: string, args?: unknown[], value?: bigint }} call
- * @returns {{ to: string, value: bigint, data: string }}
- */
-export function encodeCall({ address, abi, functionName, args = [], value = 0n }) {
-  return {
-    to: getAddress(address),
-    value: BigInt(value),
-    data: encodeFunctionData({ abi, functionName, args }),
-  };
+/** Call that transfers an ERC-20 token from the Safe. Amount is in the token's smallest unit. */
+export function erc20TransferCall(token, to, amount) {
+  return { address: token, abi: ERC20_ABI, functionName: "transfer", args: [to, amount] };
 }
 
-/** Transfers an ERC-20 token from the Safe. Amount is in the token's smallest unit. */
-export function erc20Transfer(token, to, amount) {
-  return encodeCall({ address: token, abi: ERC20_ABI, functionName: "transfer", args: [to, amount] });
-}
-
-/** Approves a spender to use an ERC-20 token held by the Safe. */
-export function erc20Approve(token, spender, amount) {
-  return encodeCall({ address: token, abi: ERC20_ABI, functionName: "approve", args: [spender, amount] });
+/** Call that approves a spender to use an ERC-20 token held by the Safe. */
+export function erc20ApproveCall(token, spender, amount) {
+  return { address: token, abi: ERC20_ABI, functionName: "approve", args: [spender, amount] };
 }
