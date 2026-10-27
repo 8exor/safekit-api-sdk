@@ -38,15 +38,26 @@
     "gnosis-safe",
     "multisig",
     "ethereum",
-    "viem"
+    "viem",
+    "ethers"
   ],
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
-    "viem": "^2.57.7"
+  "peerDependencies": {
+    "viem": "^2.57.7",
+    "ethers": "^6.17.0"
+  },
+  "peerDependenciesMeta": {
+    "viem": {
+      "optional": true
+    },
+    "ethers": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "viem": "^2.57.7",
     "ethers": "^6.17.0"
   }
 }
